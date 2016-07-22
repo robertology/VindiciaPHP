@@ -18,7 +18,6 @@ class Authentication
     $this->version = "1.1";
     $this->login = $username;
     $this->password = $password;
-    $this->evid = 1;
     $this->userAgent = "VindiciaPHP";
   }
 }
