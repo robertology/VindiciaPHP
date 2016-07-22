@@ -14,6 +14,7 @@ Vindicia PHP Client for Select APIs
     - [Refund Transactions](#refundTransactions)
     - [Report Transactions](#reportTransactions)
 - [Vindicia Documentation](#docs)
+
 <a name="usage"></a>
 ## Usage
 <a name="composer"></a>
