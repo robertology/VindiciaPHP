@@ -5,6 +5,7 @@
  */
 namespace VindiciaPHP;
 
+use VindiciaPHP\Enums\ConnectionMode;
 use VindiciaPHP\Exceptions\RequestException;
 use VindiciaPHP\Requests\BaseRequest;
 use VindiciaPHP\Requests\BillTransactionsRequest;
@@ -18,18 +19,19 @@ class VindiciaClient
   /** @var \SoapClient $_client */
   private $_client;
 
-  public function __construct($username, $password, $mode = "live")
+  public function __construct($username, $password, $mode = ConnectionMode::LIVE, $options = [])
   {
     $this->_authentication = new Authentication($username, $password);
-    $wsdl = $mode == "live" ? "https://soap.vindicia.com/1.1/Select.wsdl" : dirname(__FILE__) . "/Resources/ProdTest.wsdl";
-    $this->_client = new \SoapClient($wsdl, array(
+    $wsdl = $mode == ConnectionMode::LIVE ? "https://soap.vindicia.com/1.1/Select.wsdl" : dirname(__FILE__) . "/Resources/ProdTest.wsdl";
+    $options = array_merge([
       "cache_wsdl" => WSDL_CACHE_BOTH,
       "compression" => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
       "encoding" => "utf-8",
       "exceptions" => true,
       "connection_timeout" => 30,
       "trace" => 1
-    ));
+    ], $options);
+    $this->_client = new \SoapClient($wsdl, $options);
   }
 
   private function _runRequest($request, BaseRequest $params)
@@ -55,9 +57,24 @@ class VindiciaClient
     return $this->_runRequest("fetchBillingResults", $request);
   }
 
+  public function fetchChargebacksRequest(FetchBillingResultsRequest $request)
+  {
+    $request->setAuthentication($this->_authentication);
+    return $this->_runRequest("fetchChargebacks", $request);
+  }
+
+  public function fetchByMerchantTransactionIdRequest(FetchBillingResultsRequest $request)
+  {
+    $request->setAuthentication($this->_authentication);
+    return $this->_runRequest("fetchByMerchantTransactionId", $request);
+  }
+
+  /**
+   * Debug Functions
+   */
   public function listMethods()
   {
-    var_dump($this->_client->__getFunctions());
+    return $this->_client->__getFunctions();
   }
 
   public function getLastRequest()
