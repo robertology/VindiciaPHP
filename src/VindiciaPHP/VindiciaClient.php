@@ -10,6 +10,10 @@ use VindiciaPHP\Exceptions\RequestException;
 use VindiciaPHP\Requests\BaseRequest;
 use VindiciaPHP\Requests\BillTransactionsRequest;
 use VindiciaPHP\Requests\FetchBillingResultsRequest;
+use VindiciaPHP\Requests\FetchByMerchantTransactionIdRequest;
+use VindiciaPHP\Requests\FetchChargebacksRequest;
+use VindiciaPHP\Requests\RefundTransactionsRequest;
+use VindiciaPHP\Requests\ReportTransactionsRequest;
 use VindiciaPHP\Structs\Authentication;
 
 class VindiciaClient
@@ -57,16 +61,28 @@ class VindiciaClient
     return $this->_runRequest("fetchBillingResults", $request);
   }
 
-  public function fetchChargebacksRequest(FetchBillingResultsRequest $request)
+  public function fetchChargebacksRequest(FetchChargebacksRequest $request)
   {
     $request->setAuthentication($this->_authentication);
     return $this->_runRequest("fetchChargebacks", $request);
   }
 
-  public function fetchByMerchantTransactionIdRequest(FetchBillingResultsRequest $request)
+  public function fetchByMerchantTransactionIdRequest(FetchByMerchantTransactionIdRequest $request)
   {
     $request->setAuthentication($this->_authentication);
     return $this->_runRequest("fetchByMerchantTransactionId", $request);
+  }
+
+  public function refundTransactionsRequest(RefundTransactionsRequest $request)
+  {
+    $request->setAuthentication($this->_authentication);
+    return $this->_runRequest("refundTransactions", $request);
+  }
+
+  public function reportTransactionsRequest(ReportTransactionsRequest $request)
+  {
+    $request->setAuthentication($this->_authentication);
+    return $this->_runRequest("reportTransactions", $request);
   }
 
   /**
