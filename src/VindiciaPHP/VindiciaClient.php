@@ -18,6 +18,7 @@ use VindiciaPHP\Requests\ReportTransactionsRequest;
 use VindiciaPHP\Responses\BaseResponse;
 use VindiciaPHP\Responses\BillTransactionsResponse;
 use VindiciaPHP\Responses\FetchBillingResultsResponse;
+use VindiciaPHP\Responses\FetchByMerchantTransactionIdResponse;
 use VindiciaPHP\Structs\Authentication;
 use VindiciaPHP\Structs\InvalidTransaction;
 
@@ -99,7 +100,14 @@ class VindiciaClient
   public function fetchByMerchantTransactionIdRequest(FetchByMerchantTransactionIdRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("fetchByMerchantTransactionId", $request);
+    $rawResponse = $this->_runRequest("fetchByMerchantTransactionId", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new FetchByMerchantTransactionIdResponse($rawResponse->return);
+    if(isset($rawResponse->transaction))
+    {
+      $response->setTransaction($rawResponse->transaction);
+    }
+    return $response;
   }
 
   public function refundTransactionsRequest(RefundTransactionsRequest $request)
