@@ -59,11 +59,17 @@ class Transaction
       $this->$key = $value;
     }
     //Fix the name values to a more readable format
-    $nvps = $this->nameValues;
-    $this->nameValues = [];
-    foreach($nvps as $nvp)
+    if(is_array($this->nameValues))
     {
-      $this->nameValues[$nvp->name] = $nvp->value;
+      $nvps = $this->nameValues;
+      $this->nameValues = [];
+      foreach($nvps as $nvp)
+      {
+        if(isset($nvp->name) && isset($nvp->value))
+        {
+          $this->nameValues[$nvp->name] = $nvp->value;
+        }
+      }
     }
   }
 
