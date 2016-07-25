@@ -96,6 +96,11 @@ class VindiciaClient
     return $this->_runRequest("fetchChargebacks", $request);
   }
 
+  /**
+   * Fetch a transaction by its merchant Id
+   * @param FetchByMerchantTransactionIdRequest $request
+   * @return FetchByMerchantTransactionIdResponse
+   */
   public function fetchByMerchantTransactionIdRequest(FetchByMerchantTransactionIdRequest $request)
   {
     $request->setAuthentication($this->_authentication);
@@ -109,12 +114,29 @@ class VindiciaClient
     return $response;
   }
 
+  /**
+   * Submit transactions for refunding
+   * @param RefundTransactionsRequest $request
+   * @return ReportTransactionsResponse
+   */
   public function refundTransactionsRequest(RefundTransactionsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("refundTransactions", $request);
+    $rawResponse = $this->_runRequest("refundTransactions", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new ReportTransactionsResponse($rawResponse->return);
+    if(isset($rawResponse->response))
+    {
+      $response->addFailedTransactions($rawResponse->response);
+    }
+    return $response;
   }
 
+  /**
+   * Submit transactions for fighting chargebacks
+   * @param ReportTransactionsRequest $request
+   * @return ReportTransactionsResponse
+   */
   public function reportTransactionsRequest(ReportTransactionsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
