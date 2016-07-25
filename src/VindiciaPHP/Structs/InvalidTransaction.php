@@ -11,6 +11,12 @@ class InvalidTransaction
   private $_description;
   private $_merchantTransactionId;
 
+  /**
+   * Invalid transactions returned by a bill request
+   * @param $code
+   * @param $description
+   * @param $merchantTransactionId
+   */
   public function __construct($code, $description, $merchantTransactionId)
   {
     $this->_code = $code;
@@ -18,16 +24,25 @@ class InvalidTransaction
     $this->_merchantTransactionId = $merchantTransactionId;
   }
 
+  /**
+   * @return string
+   */
   public function getCode()
   {
     return $this->_code;
   }
 
+  /**
+   * @return string
+   */
   public function getDescription()
   {
     return $this->_description;
   }
 
+  /**
+   * @return string
+   */
   public function getMerchantTransactionId()
   {
     return $this->_merchantTransactionId;
