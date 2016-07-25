@@ -6,7 +6,6 @@
 namespace VindiciaPHP;
 
 use VindiciaPHP\Enums\ConnectionMode;
-use VindiciaPHP\Exceptions\CallException;
 use VindiciaPHP\Exceptions\RequestException;
 use VindiciaPHP\Requests\BaseRequest;
 use VindiciaPHP\Requests\BillTransactionsRequest;
@@ -19,8 +18,8 @@ use VindiciaPHP\Responses\BaseResponse;
 use VindiciaPHP\Responses\BillTransactionsResponse;
 use VindiciaPHP\Responses\FetchBillingResultsResponse;
 use VindiciaPHP\Responses\FetchByMerchantTransactionIdResponse;
+use VindiciaPHP\Responses\ReportTransactionsResponse;
 use VindiciaPHP\Structs\Authentication;
-use VindiciaPHP\Structs\InvalidTransaction;
 
 class VindiciaClient
 {
@@ -119,7 +118,14 @@ class VindiciaClient
   public function reportTransactionsRequest(ReportTransactionsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("reportTransactions", $request);
+    $rawResponse = $this->_runRequest("reportTransactions", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new ReportTransactionsResponse($rawResponse->return);
+    if(isset($rawResponse->response))
+    {
+      $response->addFailedTransactions($rawResponse->response);
+    }
+    return $response;
   }
 
   /**
