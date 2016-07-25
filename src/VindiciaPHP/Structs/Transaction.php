@@ -48,20 +48,16 @@ class Transaction
   public $VID;
 
   /**
-   * Transaction constructor.
-   * @param int $customerId
-   * @param float $amount
-   * @param String $currency
-   * @param String $status
-   * @param int|null $timestamp
+   * Hydrate this instance from a response object
+   * @param \stdClass $object
    */
-  public function __construct($customerId, $amount, $currency, $status = PaymentStatusEnum::FAILED, $timestamp = null)
+  public function hydrate(\stdClass $object)
   {
-    $this->customerId = $customerId;
-    $this->amount = $amount;
-    $this->currency = $currency;
-    $this->status = $status;
-    $this->timestamp = $timestamp ? $timestamp : time();
+    $data = get_object_vars($object);
+    foreach($data as $key => $value)
+    {
+      $this->$key = $value;
+    }
   }
 
   /**
@@ -123,6 +119,16 @@ class Transaction
   }
 
   /**
+   * @param $customerId
+   * @param $customerName
+   */
+  public function setCustomerInfo($customerId, $customerName)
+  {
+    $this->customerId = $customerId;
+    $this->accountHolderName = $customerName;
+  }
+
+  /**
    * @param String $divisionNumber Division group within payment processor (also known as report group)
    * @param String $merchantTransactionId Unique transaction id (Invoice Id)
    * @param String $subscriptionId Unique subscription transaction id (Pack id)
@@ -132,5 +138,27 @@ class Transaction
     $this->divisionNumber = $divisionNumber;
     $this->merchantTransactionId = $merchantTransactionId;
     $this->subscriptionId = $subscriptionId;
+  }
+
+  /**
+   * @param array $nvp
+   */
+  public function setNameValuePairs(array $nvp)
+  {
+    $this->nameValues = $nvp;
+  }
+
+  /**
+   * @param $amount
+   * @param $currency
+   * @param string $status
+   * @param int|null $timestamp
+   */
+  public function setTransactionInfo($amount, $currency, $status = PaymentStatusEnum::FAILED, $timestamp = null)
+  {
+    $this->amount = $amount;
+    $this->currency = $currency;
+    $this->status = $status;
+    $this->timestamp = $timestamp ? $timestamp : time();
   }
 }
