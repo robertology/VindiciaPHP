@@ -6,6 +6,7 @@
 namespace VindiciaPHP;
 
 use VindiciaPHP\Enums\ConnectionMode;
+use VindiciaPHP\Exceptions\CallException;
 use VindiciaPHP\Exceptions\RequestException;
 use VindiciaPHP\Requests\BaseRequest;
 use VindiciaPHP\Requests\BillTransactionsRequest;
@@ -14,7 +15,11 @@ use VindiciaPHP\Requests\FetchByMerchantTransactionIdRequest;
 use VindiciaPHP\Requests\FetchChargebacksRequest;
 use VindiciaPHP\Requests\RefundTransactionsRequest;
 use VindiciaPHP\Requests\ReportTransactionsRequest;
+use VindiciaPHP\Responses\BaseResponse;
+use VindiciaPHP\Responses\BillTransactionsResponse;
+use VindiciaPHP\Responses\FetchBillingResultsResponse;
 use VindiciaPHP\Structs\Authentication;
+use VindiciaPHP\Structs\InvalidTransaction;
 
 class VindiciaClient
 {
@@ -49,16 +54,40 @@ class VindiciaClient
     return $this->_client->$request($params);
   }
 
+  /**
+   * Make a Bill Transaction Request to Vindicia
+   * @param BillTransactionsRequest $request
+   * @return BillTransactionsResponse
+   */
   public function billTransactionsRequest(BillTransactionsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("billTransactions", $request);
+    $rawResponse = $this->_runRequest("billTransactions", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new BillTransactionsResponse($rawResponse->return);
+    if(isset($rawResponse->response))
+    {
+      $response->addFailedTransactions($rawResponse->response);
+    }
+    return $response;
   }
 
+  /**
+   * Fetch processed billing requests
+   * @param FetchBillingResultsRequest $request
+   * @return FetchBillingResultsResponse
+   */
   public function fetchBillingResultsRequest(FetchBillingResultsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("fetchBillingResults", $request);
+    $rawResponse = $this->_runRequest("fetchBillingResults", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new FetchBillingResultsResponse($rawResponse->return);
+    if(isset($rawResponse->transactions))
+    {
+      $response->addTransactions($rawResponse->transactions);
+    }
+    return $response;
   }
 
   public function fetchChargebacksRequest(FetchChargebacksRequest $request)
