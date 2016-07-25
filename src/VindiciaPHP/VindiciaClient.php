@@ -18,6 +18,8 @@ use VindiciaPHP\Responses\BaseResponse;
 use VindiciaPHP\Responses\BillTransactionsResponse;
 use VindiciaPHP\Responses\FetchBillingResultsResponse;
 use VindiciaPHP\Responses\FetchByMerchantTransactionIdResponse;
+use VindiciaPHP\Responses\FetchChargebacksResponse;
+use VindiciaPHP\Responses\RefundTransactionsResponse;
 use VindiciaPHP\Responses\ReportTransactionsResponse;
 use VindiciaPHP\Structs\Authentication;
 
@@ -90,10 +92,22 @@ class VindiciaClient
     return $response;
   }
 
+  /**
+   * Fetch processed chargebacks
+   * @param FetchChargebacksRequest $request
+   * @return FetchChargebacksResponse
+   */
   public function fetchChargebacksRequest(FetchChargebacksRequest $request)
   {
     $request->setAuthentication($this->_authentication);
-    return $this->_runRequest("fetchChargebacks", $request);
+    $rawResponse = $this->_runRequest("fetchChargebacks", $request);
+    BaseResponse::validate($rawResponse);
+    $response = new FetchChargebacksResponse($rawResponse->return);
+    if(isset($rawResponse->chargebacks))
+    {
+      $response->addChargebacks($rawResponse->transaction);
+    }
+    return $response;
   }
 
   /**
@@ -117,14 +131,14 @@ class VindiciaClient
   /**
    * Submit transactions for refunding
    * @param RefundTransactionsRequest $request
-   * @return ReportTransactionsResponse
+   * @return RefundTransactionsResponse
    */
   public function refundTransactionsRequest(RefundTransactionsRequest $request)
   {
     $request->setAuthentication($this->_authentication);
     $rawResponse = $this->_runRequest("refundTransactions", $request);
     BaseResponse::validate($rawResponse);
-    $response = new ReportTransactionsResponse($rawResponse->return);
+    $response = new RefundTransactionsResponse($rawResponse->return);
     if(isset($rawResponse->response))
     {
       $response->addFailedTransactions($rawResponse->response);
