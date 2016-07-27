@@ -34,7 +34,7 @@ class Transaction
   public $cvnCode;
   public $divisionNumber;
   public $merchantTransactionId;
-  public $nameValues;
+  public $nameValues = [];
   public $paymentMethodId;
   public $paymentMethodIsTokenized;
   public $previousBillingCount;
@@ -46,6 +46,11 @@ class Transaction
   public $subscriptionStartDate;
   public $timestamp;
   public $VID;
+
+  public function addNameValuePair(NameValuePair $nvp)
+  {
+    $this->nameValues[] = $nvp;
+  }
 
   /**
    * Hydrate this instance from a response object
@@ -154,7 +159,7 @@ class Transaction
   }
 
   /**
-   * @param array $nvp
+   * @param NameValuePair[] $nvp
    */
   public function setNameValuePairs(array $nvp)
   {
