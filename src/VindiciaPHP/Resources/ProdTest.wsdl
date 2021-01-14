@@ -373,7 +373,7 @@ Loads a transaction for a merchant transaction ID.<p>
     </binding>
     <service name="Select">
         <port binding="tns:SelectBinding" name="SelectPort">
-            <soap:address location="https://soap.prodtest.sj.vindicia.com/soap.pl" />
+            <soap:address location="https://soap.staging.us-west.vindicia.com/soap.pl" />
         </port>
     </service>
 </definitions>
